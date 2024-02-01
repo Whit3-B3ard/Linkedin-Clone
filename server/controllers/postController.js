@@ -2,6 +2,7 @@ import Post from "../models/postSchema.js";
 
 export const addPost = async (req, res) => {
   try {
+    console.log("add post:", req.body);
     const newPost = new Post(req.body);
     await newPost.save();
     await newPost.populate("author");
