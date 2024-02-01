@@ -14,16 +14,7 @@ const Posts = () => {
   } = useContext(PostContext);
   const [commentText, setCommentText] = useState("");
   const [showCommentInput, setShowCommentInput] = useState({});
-
-  useEffect(() => {
-    if (allPosts) {
-      allPosts.forEach((post) => {
-        fetchComments(post._id);
-      });
-    }
-  }, [user, setCommentText]);
-
-  console.log("comments", comments);
+  const [selectedPostId, setSelectedPostId] = useState(null);
 
   const handleToggleCommentInput = (postId) => {
     setShowCommentInput((prev) => ({
@@ -38,6 +29,15 @@ const Posts = () => {
     handleToggleCommentInput(postId);
     setCommentText("");
   };
+
+  const handleFetchComments = (postId) => {
+    fetchComments(postId);
+    console.log("Fetching comments for post with ID:", postId);
+    setSelectedPostId(postId);
+  };
+  useEffect(() => {
+    handleFetchComments();
+  }, []);
 
   return (
     <>
@@ -94,11 +94,31 @@ const Posts = () => {
                   </div>
                 )}
                 {/* Render comments */}
-                {comments?.map((comment, index) => (
-                  <div key={index} className="mt-4 bg-gray-200 p-2 rounded">
-                    <p className="text-gray-700">{comment.content}</p>
+                {selectedPostId === post._id && comments && (
+                  <div className="mt-4">
+                    {comments.map((comment, index) => (
+                      <div key={index} className="bg-gray-200 p-2 rounded">
+                        <p className="text-gray-700">{comment.content}</p>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                )}
+                {selectedPostId === post._id && (
+                  <button
+                    onClick={() => setSelectedPostId(null)}
+                    className="text-blue-500 mt-2"
+                  >
+                    Hide Comments
+                  </button>
+                )}
+                {!selectedPostId && (
+                  <button
+                    onClick={() => handleFetchComments(post._id)}
+                    className="text-blue-500 mt-2"
+                  >
+                    Show Comments
+                  </button>
+                )}
               </div>
             ))}
           </div>
